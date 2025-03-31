@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -27,12 +26,9 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Use EmailJS to send the email
-    // You'll need to sign up for EmailJS and get your service ID, template ID, and user ID
-    // Replace the placeholders below with your actual IDs from EmailJS dashboard
     emailjs.send(
-      'YOUR_SERVICE_ID', // Create a service in EmailJS dashboard and paste ID here
-      'YOUR_TEMPLATE_ID', // Create an email template and paste ID here
+      'service_n0lk51u',
+      'template_k1da5fk',
       {
         from_name: formData.name,
         from_email: formData.email,
@@ -40,7 +36,7 @@ const ContactSection = () => {
         message: formData.message,
         to_email: 'icode.offical@gmail.com',
       },
-      'YOUR_USER_ID' // Your EmailJS public key
+      'EScOu4u49V1sLyuUZ'
     )
       .then(() => {
         setIsSubmitting(false);
