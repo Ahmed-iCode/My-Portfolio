@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -5,6 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin, Send } from 'lucide-react';
+import emailjs from 'emailjs-com';
 
 const ContactSection = () => {
   const { toast } = useToast();
@@ -25,20 +27,43 @@ const ContactSection = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
-      toast({
-        title: "Message sent!",
-        description: "Thank you for your message. I'll get back to you soon.",
+    // Use EmailJS to send the email
+    // You'll need to sign up for EmailJS and get your service ID, template ID, and user ID
+    // Replace the placeholders below with your actual IDs from EmailJS dashboard
+    emailjs.send(
+      'YOUR_SERVICE_ID', // Create a service in EmailJS dashboard and paste ID here
+      'YOUR_TEMPLATE_ID', // Create an email template and paste ID here
+      {
+        from_name: formData.name,
+        from_email: formData.email,
+        subject: formData.subject,
+        message: formData.message,
+        to_email: 'icode.offical@gmail.com',
+      },
+      'YOUR_USER_ID' // Your EmailJS public key
+    )
+      .then(() => {
+        setIsSubmitting(false);
+        toast({
+          title: "Message sent!",
+          description: "Thank you for your message. I'll get back to you soon.",
+        });
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+      })
+      .catch((error) => {
+        console.error('Email sending failed:', error);
+        setIsSubmitting(false);
+        toast({
+          title: "Error",
+          description: "Failed to send your message. Please try again later.",
+          variant: "destructive",
+        });
       });
-      setFormData({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-      });
-    }, 1500);
   };
 
   return (
