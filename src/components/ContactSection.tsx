@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -152,8 +151,8 @@ const ContactSection = () => {
                   <div>
                     <h4 className="font-medium">Email</h4>
                     <p className="text-muted-foreground">
-                      <a href="mailto:contact@johndoe.com" className="hover:text-primary transition-colors">
-                        contact@johndoe.com
+                      <a href="mailto:icode.offical@gmail.com" className="hover:text-primary transition-colors">
+                        icode.offical@gmail.com
                       </a>
                     </p>
                   </div>
