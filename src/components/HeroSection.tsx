@@ -10,8 +10,8 @@ const HeroSection = () => {
         <div className="max-w-3xl mx-auto text-center md:text-left md:mx-0">
           <p className="text-secondary font-medium mb-3 animate-fade-in">Hello, I'm</p>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fade-in">
-            <span className="text-foreground">John</span>{' '}
-            <span className="text-primary">Doe</span>
+            <span className="text-foreground">Ahmed</span>{' '}
+            <span className="text-primary">Samir</span>
           </h1>
           <h2 className="text-2xl md:text-3xl lg:text-4xl font-medium mb-6 text-muted-foreground animate-fade-in">
             Full Stack Developer

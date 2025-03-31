@@ -1,24 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { certificates } from '@/data/certificates';
 
-const CertificatesSection: React.FC = () => {
-  const featuredCertificates = certificates.filter(cert => cert.featured);
-
+const Certificates = () => {
   return (
-    <section id="certificates" className="py-20 bg-muted/50">
+    <div className="min-h-screen py-20">
       <div className="container">
-        <div className="flex justify-between items-center mb-12">
-          <h2 className="text-3xl font-bold">Certificates</h2>
-          <Link to="/certificates">
-            <Button variant="outline">View All Certificates</Button>
-          </Link>
-        </div>
+        <h1 className="text-4xl font-bold mb-12">All Certificates</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredCertificates.map((cert, index) => (
+          {certificates.map((cert, index) => (
             <motion.div
               key={cert.id}
               initial={{ opacity: 0, y: 20 }}
@@ -59,8 +50,8 @@ const CertificatesSection: React.FC = () => {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
-export default CertificatesSection;
+export default Certificates; 

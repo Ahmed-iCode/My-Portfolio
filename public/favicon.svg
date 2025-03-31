@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1080" height="1080" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <clipPath id="circle">
+      <circle cx="256" cy="256" r="256" />
+    </clipPath>
+  </defs>
+  <g clip-path="url(#circle)">
+    <rect width="750" height="750" fill="#002147"/>
+    <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="Arial" font-size="280" fill="#7DD3FC">
+      icode
+    </text>
+    <text x="50%" y="65%" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="100" fill="#7DD3FC">
+      &lt;/&gt;
+    </text>
+  </g>
+</svg> 

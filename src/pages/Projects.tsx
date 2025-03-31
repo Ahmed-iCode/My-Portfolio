@@ -1,24 +1,15 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
 import { projects } from '@/data/projects';
 
-const ProjectsSection: React.FC = () => {
-  const featuredProjects = projects.filter(project => project.featured);
-
+const Projects = () => {
   return (
-    <section id="projects" className="py-20 bg-muted/50">
+    <div className="min-h-screen py-20">
       <div className="container">
-        <div className="flex justify-between items-center mb-12">
-          <h2 className="text-3xl font-bold">Projects</h2>
-          <Link to="/projects">
-            <Button variant="outline">View All Projects</Button>
-          </Link>
-        </div>
+        <h1 className="text-4xl font-bold mb-12">All Projects</h1>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {featuredProjects.map((project, index) => (
+          {projects.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 20 }}
@@ -68,8 +59,8 @@ const ProjectsSection: React.FC = () => {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 
-export default ProjectsSection;
+export default Projects; 

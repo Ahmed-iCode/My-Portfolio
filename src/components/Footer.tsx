@@ -33,20 +33,8 @@ const Footer = () => {
         <div className="border-t border-border pt-6">
           <div className="flex flex-col sm:flex-row justify-between items-center">
             <p className="text-sm text-muted-foreground mb-4 sm:mb-0">
-              &copy; {currentYear} John Doe. All rights reserved.
+              &copy; {currentYear} Ahmed Samir. All rights reserved.
             </p>
-            
-            <nav className="flex space-x-6">
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                Sitemap
-              </a>
-            </nav>
           </div>
         </div>
       </div>

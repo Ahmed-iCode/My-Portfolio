@@ -1,11 +1,9 @@
-
 import React from 'react';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import ProjectsSection from '@/components/ProjectsSection';
-import SkillsSection from '@/components/SkillsSection';
 import CertificatesSection from '@/components/CertificatesSection';
-import ArticlesSection from '@/components/ArticlesSection';
+import SkillsSection from '@/components/SkillsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 
@@ -16,9 +14,8 @@ const Index = () => {
       <main>
         <HeroSection />
         <ProjectsSection />
-        <SkillsSection />
         <CertificatesSection />
-        <ArticlesSection />
+        <SkillsSection />
         <ContactSection />
       </main>
       <Footer />

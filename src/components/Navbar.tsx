@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -25,11 +25,10 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { title: 'Home', url: '#hero' },
-    { title: 'Projects', url: '#projects' },
+    { title: 'Home', url: '#' },
+    { title: 'Projects', url: '/projects' },
+    { title: 'Certificates', url: '/certificates' },
     { title: 'Skills', url: '#skills' },
-    { title: 'Certificates', url: '#certificates' },
-    { title: 'Articles', url: '#articles' },
     { title: 'Contact', url: '#contact' },
   ];
 
@@ -39,20 +38,30 @@ const Navbar = () => {
       scrolled ? 'bg-background/95 backdrop-blur-sm shadow-sm py-3' : 'bg-transparent py-5'
     )}>
       <div className="container flex items-center justify-between">
-        <a href="#" className="text-xl font-bold text-primary">
+        <Link to="/" className="text-xl font-bold text-primary">
           <span className="text-foreground">Dev</span>Portfolio
-        </a>
+        </Link>
         
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-8">
           {navLinks.map((link, index) => (
-            <a 
-              key={index} 
-              href={link.url}
-              className="nav-link"
-            >
-              {link.title}
-            </a>
+            link.url.startsWith('/') ? (
+              <Link 
+                key={index} 
+                to={link.url}
+                className="nav-link"
+              >
+                {link.title}
+              </Link>
+            ) : (
+              <a 
+                key={index} 
+                href={link.url}
+                className="nav-link"
+              >
+                {link.title}
+              </a>
+            )
           ))}
           <ThemeToggle />
         </nav>
@@ -77,14 +86,25 @@ const Navbar = () => {
       )}>
         <nav className="flex flex-col p-5 space-y-4">
           {navLinks.map((link, index) => (
-            <a 
-              key={index} 
-              href={link.url} 
-              className="text-lg py-2 border-b border-muted" 
-              onClick={() => setIsOpen(false)}
-            >
-              {link.title}
-            </a>
+            link.url.startsWith('/') ? (
+              <Link 
+                key={index} 
+                to={link.url}
+                className="text-lg py-2 border-b border-muted"
+                onClick={() => setIsOpen(false)}
+              >
+                {link.title}
+              </Link>
+            ) : (
+              <a 
+                key={index} 
+                href={link.url}
+                className="text-lg py-2 border-b border-muted"
+                onClick={() => setIsOpen(false)}
+              >
+                {link.title}
+              </a>
+            )
           ))}
         </nav>
       </div>

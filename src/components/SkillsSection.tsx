@@ -18,49 +18,49 @@ const skillCategories: SkillCategory[] = [
   {
     category: 'Frontend',
     skills: [
-      { name: 'HTML5 & CSS3', level: 90 },
-      { name: 'JavaScript (ES6+)', level: 85 },
-      { name: 'React.js', level: 85 },
-      { name: 'TypeScript', level: 75 },
-      { name: 'Next.js', level: 70 },
-      { name: 'Vue.js', level: 65 },
-      { name: 'Tailwind CSS', level: 80 },
+      { name: 'HTML5 & CSS3', level: 80 },
+      { name: 'JavaScript (ES6+)', level: 70 },
+      { name: 'React.js', level: 70 },
+      { name: 'TypeScript', level: 50 },
+      { name: 'Next.js', level: 20 },
+      { name: 'Vue.js', level: 40 },
+      { name: 'Tailwind CSS', level: 30 },
     ]
   },
   {
     category: 'Backend',
     skills: [
-      { name: 'Node.js', level: 80 },
-      { name: 'Express.js', level: 75 },
-      { name: 'RESTful APIs', level: 85 },
-      { name: 'GraphQL', level: 65 },
+      { name: 'Node.js', level: 75 },
+      { name: 'Express.js', level: 20 },
+      { name: 'RESTful APIs', level: 50 },
+      { name: 'GraphQL', level: 0 },
       { name: 'SQL Databases', level: 70 },
       { name: 'NoSQL Databases', level: 75 },
-      { name: 'Authentication', level: 80 },
+      { name: 'Authentication', level: 0 },
     ]
   },
   {
     category: 'Tools',
     skills: [
-      { name: 'Git & GitHub', level: 85 },
-      { name: 'Docker', level: 65 },
-      { name: 'CI/CD', level: 70 },
-      { name: 'Webpack', level: 75 },
-      { name: 'Jest & Testing Library', level: 70 },
-      { name: 'Figma', level: 60 },
+      { name: 'Git & GitHub', level: 75 },
+      { name: 'Docker', level: 0 },
+      { name: 'CI/CD', level: 0 },
+      { name: 'Webpack', level: 10 },
+      { name: 'Jest & Testing Library', level: 10 },
+      { name: 'Figma', level: 40 },
       { name: 'VS Code', level: 90 },
     ]
   },
   {
     category: 'Soft Skills',
     skills: [
-      { name: 'Problem Solving', level: 90 },
+      { name: 'Problem Solving', level: 70 },
       { name: 'Communication', level: 85 },
-      { name: 'Team Collaboration', level: 90 },
-      { name: 'Time Management', level: 80 },
-      { name: 'Adaptability', level: 85 },
-      { name: 'Project Management', level: 75 },
-      { name: 'Mentoring', level: 70 },
+      { name: 'Team Collaboration', level: 85 },
+      { name: 'Time Management', level: 90 },
+      { name: 'Adaptability', level: 75 },
+      { name: 'Project Management', level: 70 },
+      { name: 'Mentoring', level: 60 },
     ]
   }
 ];
