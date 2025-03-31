@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -43,7 +44,7 @@ const Navbar = () => {
         </a>
         
         {/* Desktop Nav */}
-        <nav className="hidden md:flex space-x-8">
+        <nav className="hidden md:flex items-center space-x-8">
           {navLinks.map((link, index) => (
             <a 
               key={index} 
@@ -53,17 +54,20 @@ const Navbar = () => {
               {link.title}
             </a>
           ))}
+          <ThemeToggle />
         </nav>
         
-        {/* Mobile Nav Button */}
-        <Button 
-          variant="ghost" 
-          className="md:hidden" 
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </Button>
+        {/* Mobile Nav Button and Theme Toggle */}
+        <div className="flex items-center md:hidden space-x-2">
+          <ThemeToggle />
+          <Button 
+            variant="ghost" 
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </Button>
+        </div>
       </div>
       
       {/* Mobile Nav Menu */}
