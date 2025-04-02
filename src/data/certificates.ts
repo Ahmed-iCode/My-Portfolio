@@ -169,7 +169,7 @@ export const certificates: Certificate[] = [
     image: "https://i.postimg.cc/XJPkGSJx/certificate-7.png",
     certificateUrl: "https://i.postimg.cc/XJPkGSJx/certificate-7.png",
     skills: ["Destructuring", "Regular Expressions", "Promises"],
-    featured: true
+    featured: false
   },
   {
     id: 25,
@@ -305,6 +305,16 @@ export const certificates: Certificate[] = [
     image: "https://i.postimg.cc/HkrG11Nz/IBMDesign20250331-28-idx26v.png",
     certificateUrl: "https://www.credly.com/badges/1bd25263-6d47-47cc-93d2-8e77786d4cfa",
     skills: ["Web Development", "HTML", "CSS", "DevOps"],
+    featured: true
+  },
+  {
+    id: 29,
+    title: "Frontend Engineering with React",
+    issuer: "Manara",
+    date: "2024",
+    image: "https://i.postimg.cc/HLT0VcPN/Frontend-Engineering-with-React-Manara.png",
+    certificateUrl: "https://app.manara.tech/verify-certificate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjZXJ0aWZpY2F0ZUlkIjozNDA2MywiaWF0IjoxNzQzNTI5NjY2fQ.yYxorgRxVc73AJ0oEzdq1r8pqImyw7gTn7rCTBq37RU",
+    skills: ["React", "Frontend", "Web Development"],
     featured: true
   }
 ]; 
