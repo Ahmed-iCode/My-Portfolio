@@ -212,7 +212,7 @@ export const certificates: Certificate[] = [
     image: "https://udemy-certificate.s3.amazonaws.com/image/UC-966caa79-6fcc-4a58-8e67-5fc9146f6380.jpg?v=1718111616000",
     certificateUrl: "https://ude.my/UC-966caa79-6fcc-4a58-8e67-5fc9146f6380",
     skills: ["Web Design", "HTML", "CSS"],
-    featured: true
+    featured: false
   },
   {
     id: 2,
@@ -264,7 +264,7 @@ export const certificates: Certificate[] = [
     image: "https://s3.amazonaws.com/coursera_assets/meta_images/generated/CERTIFICATE_LANDING_PAGE/CERTIFICATE_LANDING_PAGE~VAD2F5DAL23B/CERTIFICATE_LANDING_PAGE~VAD2F5DAL23B.jpeg",
     certificateUrl: "https://www.coursera.org/account/accomplishments/verify/VAD2F5DAL23B",
     skills: ["Social Media Marketing", "Social Media Marketing Strategy", "Digital Marketing"],
-    featured: true
+    featured: false
   },
   {
     id: 21,
@@ -285,7 +285,7 @@ export const certificates: Certificate[] = [
     image: "https://i.postimg.cc/yNjHznd7/image.png",
     certificateUrl: "https://programs.edraak.org/learn/course/pec-v1/issue_certificate/?lang=en",
     skills: ["Communication", "Communication Skills", "Effective Communication"],
-    featured: true
+    featured: false
   },
   {
     id: 27,
@@ -305,7 +305,7 @@ export const certificates: Certificate[] = [
     image: "https://i.postimg.cc/HkrG11Nz/IBMDesign20250331-28-idx26v.png",
     certificateUrl: "https://www.credly.com/badges/1bd25263-6d47-47cc-93d2-8e77786d4cfa",
     skills: ["Web Development", "HTML", "CSS", "DevOps"],
-    featured: true
+    featured: false
   },
   {
     id: 29,
@@ -315,6 +315,16 @@ export const certificates: Certificate[] = [
     image: "https://i.postimg.cc/HLT0VcPN/Frontend-Engineering-with-React-Manara.png",
     certificateUrl: "https://app.manara.tech/verify-certificate?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjZXJ0aWZpY2F0ZUlkIjozNDA2MywiaWF0IjoxNzQzNTI5NjY2fQ.yYxorgRxVc73AJ0oEzdq1r8pqImyw7gTn7rCTBq37RU",
     skills: ["React", "Frontend", "Web Development"],
+    featured: true
+  },
+  {
+    id: 30,
+    title: "Introduction to Software Engineering",
+    issuer: "IBM",
+    date: "2025",
+    image: "https://s3.amazonaws.com/coursera_assets/meta_images/generated/CERTIFICATE_LANDING_PAGE/CERTIFICATE_LANDING_PAGE~1K8X0PZTAJC9/CERTIFICATE_LANDING_PAGE~1K8X0PZTAJC9.jpeg",
+    certificateUrl: "https://coursera.org/verify/1K8X0PZTAJC9",
+    skills: ["Web Development", "Software Architecture", "Software Development Life Cycle"],
     featured: true
   }
 ]; 
