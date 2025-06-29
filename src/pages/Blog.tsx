@@ -2,7 +2,6 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Clock, Calendar, User, ArrowRight, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { articles, categories, formatDate } from '@/data/articles';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import BlogSkeleton from '@/components/BlogSkeleton';
@@ -10,17 +9,32 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter } from '@/utils/analytics';
+import { useArticles, useArticleCategories } from '@/hooks/useSupabaseData';
+
+// Helper function to format date
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch data from Supabase
+  const { data: articles, isLoading: isLoadingArticles, error } = useArticles();
+  const { data: categories } = useArticleCategories();
+
   // Track user engagement
   useScrollTracking('blog');
   useTimeTracking('blog');
 
-  // Simulate loading state
+  // Simulate loading state for better UX
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -31,6 +45,8 @@ const Blog = () => {
 
   // Filter articles based on search and category
   const filteredArticles = useMemo(() => {
+    if (!articles) return [];
+    
     return articles.filter(article => {
       const matchesCategory = selectedCategory === 'All' || article.category === selectedCategory;
       const matchesSearch = searchTerm === '' || 
@@ -40,7 +56,7 @@ const Blog = () => {
       
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchTerm]);
+  }, [articles, selectedCategory, searchTerm]);
 
   // Track search usage
   useEffect(() => {
@@ -55,6 +71,7 @@ const Blog = () => {
 
   // Get article count by category
   const getCategoryCount = (category: string) => {
+    if (!articles) return 0;
     if (category === 'All') return articles.length;
     return articles.filter(article => article.category === category).length;
   };
@@ -67,6 +84,12 @@ const Blog = () => {
   // Separate featured and regular articles
   const featuredArticles = filteredArticles.filter(article => article.featured);
   const regularArticles = filteredArticles.filter(article => !article.featured);
+
+  if (error) {
+    console.error('Error loading articles:', error);
+  }
+
+  const showLoading = isLoading || isLoadingArticles;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -102,20 +125,20 @@ const Blog = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full"
-                disabled={isLoading}
+                disabled={showLoading}
               />
             </div>
 
             {/* Category Filter */}
             <div className="flex flex-wrap justify-center gap-2">
-              {categories.map((category) => (
+              {(categories || ['All']).map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleCategoryFilter(category)}
                   className="relative"
-                  disabled={isLoading}
+                  disabled={showLoading}
                 >
                   <Filter size={14} className="mr-2" />
                   {category}
@@ -128,7 +151,7 @@ const Blog = () => {
           </motion.div>
 
           {/* Results Summary */}
-          {!isLoading && (
+          {!showLoading && articles && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -143,7 +166,7 @@ const Blog = () => {
             </motion.div>
           )}
 
-          {isLoading ? (
+          {showLoading ? (
             // Show skeleton loaders
             <div className="space-y-12">
               {/* Featured Articles Skeleton */}
@@ -227,11 +250,11 @@ const Blog = () => {
                           <div className="flex items-center gap-4 mb-3 text-sm text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar size={14} />
-                              <span>{formatDate(article.publishedAt)}</span>
+                              <span>{formatDate(article.published_at)}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock size={14} />
-                              <span>{article.readingTime} min read</span>
+                              <span>{article.reading_time} min read</span>
                             </div>
                           </div>
 
@@ -313,11 +336,11 @@ const Blog = () => {
                           <div className="flex items-center gap-3 mb-3 text-xs text-muted-foreground">
                             <div className="flex items-center gap-1">
                               <Calendar size={12} />
-                              <span>{formatDate(article.publishedAt)}</span>
+                              <span>{formatDate(article.published_at)}</span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock size={12} />
-                              <span>{article.readingTime} min</span>
+                              <span>{article.reading_time} min</span>
                             </div>
                           </div>
 

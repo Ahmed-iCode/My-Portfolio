@@ -6,16 +6,27 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
-import { articles, formatDate } from '@/data/articles';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackArticleView, trackArticleShare } from '@/utils/analytics';
+import { useArticleBySlug, useArticles } from '@/hooks/useSupabaseData';
+
+// Helper function to format date
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+};
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
-  const article = articles.find(a => a.slug === slug);
+  const { data: article, isLoading, error } = useArticleBySlug(slug || '');
+  const { data: allArticles } = useArticles();
 
   // Track user engagement
   useScrollTracking(`blog-post-${slug}`);
@@ -24,26 +35,26 @@ const BlogPost = () => {
   // Update document title and meta tags
   useEffect(() => {
     if (article) {
-      document.title = article.seo.metaTitle || `${article.title} - Ahmed Samir`;
+      document.title = article.meta_title || `${article.title} - Ahmed Samir`;
       
       // Track article view
-      trackArticleView(article.title, article.category, article.readingTime);
+      trackArticleView(article.title, article.category, article.reading_time);
       
       // Update meta description
       const metaDescription = document.querySelector('meta[name="description"]');
-      if (metaDescription && article.seo.metaDescription) {
-        metaDescription.setAttribute('content', article.seo.metaDescription);
+      if (metaDescription && article.meta_description) {
+        metaDescription.setAttribute('content', article.meta_description);
       }
 
       // Update meta keywords
       let metaKeywords = document.querySelector('meta[name="keywords"]');
-      if (article.seo.keywords) {
+      if (article.keywords && article.keywords.length > 0) {
         if (!metaKeywords) {
           metaKeywords = document.createElement('meta');
           metaKeywords.setAttribute('name', 'keywords');
           document.head.appendChild(metaKeywords);
         }
-        metaKeywords.setAttribute('content', article.seo.keywords.join(', '));
+        metaKeywords.setAttribute('content', article.keywords.join(', '));
       }
     }
 
@@ -53,7 +64,31 @@ const BlogPost = () => {
     };
   }, [article]);
 
-  if (!article) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <main className="flex-1 py-20">
+          <div className="container max-w-4xl">
+            <div className="animate-pulse">
+              <div className="h-8 w-32 bg-muted rounded mb-8"></div>
+              <div className="h-12 w-3/4 bg-muted rounded mb-4"></div>
+              <div className="h-6 w-1/2 bg-muted rounded mb-8"></div>
+              <div className="h-64 w-full bg-muted rounded mb-8"></div>
+              <div className="space-y-4">
+                <div className="h-4 w-full bg-muted rounded"></div>
+                <div className="h-4 w-5/6 bg-muted rounded"></div>
+                <div className="h-4 w-4/6 bg-muted rounded"></div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !article) {
     return <Navigate to="/blog" replace />;
   }
 
@@ -189,15 +224,15 @@ const BlogPost = () => {
             <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-6">
               <div className="flex items-center gap-2">
                 <User size={16} />
-                <span>{article.author.name}</span>
+                <span>{article.author_name}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar size={16} />
-                <span>{formatDate(article.publishedAt)}</span>
+                <span>{formatDate(article.published_at)}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock size={16} />
-                <span>{article.readingTime} min read</span>
+                <span>{article.reading_time} min read</span>
               </div>
               <Button
                 variant="ghost"
@@ -280,40 +315,42 @@ const BlogPost = () => {
           </motion.footer>
 
           {/* Related Articles */}
-          <motion.section
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
-            className="mt-16"
-          >
-            <h2 className="text-2xl font-bold mb-6">More Articles</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {articles
-                .filter(a => a.id !== article.id)
-                .slice(0, 2)
-                .map((relatedArticle) => (
-                  <Link
-                    key={relatedArticle.id}
-                    to={`/blog/${relatedArticle.slug}`}
-                    className="group bg-card rounded-lg border p-6 hover:shadow-lg transition-all duration-300"
-                  >
-                    <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
-                      {relatedArticle.title}
-                    </h3>
-                    <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
-                      {relatedArticle.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{formatDate(relatedArticle.publishedAt)}</span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={12} />
-                        {relatedArticle.readingTime} min
-                      </span>
-                    </div>
-                  </Link>
-                ))}
-            </div>
-          </motion.section>
+          {allArticles && allArticles.length > 1 && (
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6 }}
+              className="mt-16"
+            >
+              <h2 className="text-2xl font-bold mb-6">More Articles</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {allArticles
+                  .filter(a => a.id !== article.id)
+                  .slice(0, 2)
+                  .map((relatedArticle) => (
+                    <Link
+                      key={relatedArticle.id}
+                      to={`/blog/${relatedArticle.slug}`}
+                      className="group bg-card rounded-lg border p-6 hover:shadow-lg transition-all duration-300"
+                    >
+                      <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                        {relatedArticle.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+                        {relatedArticle.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{formatDate(relatedArticle.published_at)}</span>
+                        <span className="flex items-center gap-1">
+                          <Clock size={12} />
+                          {relatedArticle.reading_time} min
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
+              </div>
+            </motion.section>
+          )}
         </article>
       </main>
       <Footer />

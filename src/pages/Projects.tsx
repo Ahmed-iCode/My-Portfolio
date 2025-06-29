@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ExternalLink, Github, Filter } from 'lucide-react';
-import { projects } from '@/data/projects';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
@@ -9,17 +8,21 @@ import Footer from '@/components/Footer';
 import ProjectSkeleton from '@/components/ProjectSkeleton';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter, trackProjectDemo, trackProjectCode, trackProjectView } from '@/utils/analytics';
+import { useProjects } from '@/hooks/useSupabaseData';
 
 const Projects = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTech, setSelectedTech] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch projects from Supabase
+  const { data: projects, isLoading: isLoadingProjects, error } = useProjects();
+
   // Track user engagement
   useScrollTracking('projects');
   useTimeTracking('projects');
 
-  // Simulate loading state
+  // Simulate loading state for better UX
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -29,19 +32,27 @@ const Projects = () => {
   }, []);
 
   // Get all unique technologies
-  const allTechnologies = ['All', ...Array.from(new Set(projects.flatMap(project => project.techStack)))];
+  const allTechnologies = useMemo(() => {
+    if (!projects) return ['All'];
+    const techs = projects.flatMap(project => project.tech_stack);
+    return ['All', ...Array.from(new Set(techs))];
+  }, [projects]);
 
   // Filter projects based on search and technology
-  const filteredProjects = projects.filter(project => {
-    const matchesSearch = searchTerm === '' || 
-      project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      project.techStack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredProjects = useMemo(() => {
+    if (!projects) return [];
     
-    const matchesTech = selectedTech === 'All' || project.techStack.includes(selectedTech);
-    
-    return matchesSearch && matchesTech;
-  });
+    return projects.filter(project => {
+      const matchesSearch = searchTerm === '' || 
+        project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        project.tech_stack.some(tech => tech.toLowerCase().includes(searchTerm.toLowerCase()));
+      
+      const matchesTech = selectedTech === 'All' || project.tech_stack.includes(selectedTech);
+      
+      return matchesSearch && matchesTech;
+    });
+  }, [projects, searchTerm, selectedTech]);
 
   // Track search usage
   useEffect(() => {
@@ -60,16 +71,22 @@ const Projects = () => {
   };
 
   const handleProjectDemo = (project: any) => {
-    trackProjectDemo(project.title, project.demoLink);
+    trackProjectDemo(project.title, project.demo_link);
   };
 
   const handleProjectCode = (project: any) => {
-    trackProjectCode(project.title, project.githubLink);
+    trackProjectCode(project.title, project.github_link);
   };
 
   const handleProjectView = (project: any) => {
-    trackProjectView(project.title, project.techStack);
+    trackProjectView(project.title, project.tech_stack);
   };
+
+  if (error) {
+    console.error('Error loading projects:', error);
+  }
+
+  const showLoading = isLoading || isLoadingProjects;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -105,7 +122,7 @@ const Projects = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full"
-                disabled={isLoading}
+                disabled={showLoading}
               />
             </div>
 
@@ -118,7 +135,7 @@ const Projects = () => {
                   size="sm"
                   onClick={() => handleTechFilter(tech)}
                   className="text-xs"
-                  disabled={isLoading}
+                  disabled={showLoading}
                 >
                   <Filter size={12} className="mr-1" />
                   {tech}
@@ -128,7 +145,7 @@ const Projects = () => {
           </motion.div>
 
           {/* Results Summary */}
-          {!isLoading && (
+          {!showLoading && projects && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -145,7 +162,7 @@ const Projects = () => {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {isLoading ? (
+            {showLoading ? (
               // Show skeleton loaders
               Array.from({ length: 6 }).map((_, index) => (
                 <motion.div
@@ -157,7 +174,7 @@ const Projects = () => {
                   <ProjectSkeleton />
                 </motion.div>
               ))
-            ) : (
+            ) : filteredProjects.length > 0 ? (
               // Show actual projects
               filteredProjects.map((project, index) => (
                 <motion.article
@@ -196,7 +213,7 @@ const Projects = () => {
                     </p>
                     
                     <div className="flex flex-wrap gap-2 mb-6">
-                      {project.techStack.map((tech, i) => (
+                      {project.tech_stack.map((tech, i) => (
                         <span
                           key={i}
                           className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-medium cursor-pointer hover:bg-secondary/20 transition-colors"
@@ -213,7 +230,7 @@ const Projects = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex space-x-3">
                         <a
-                          href={project.demoLink}
+                          href={project.demo_link}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
@@ -227,7 +244,7 @@ const Projects = () => {
                           Live Demo
                         </a>
                         <a
-                          href={project.githubLink}
+                          href={project.github_link}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
@@ -245,31 +262,29 @@ const Projects = () => {
                   </div>
                 </motion.article>
               ))
+            ) : (
+              // No results message
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full text-center py-12"
+              >
+                <div className="text-muted-foreground mb-4">
+                  <h3 className="text-xl font-semibold mb-2">No projects found</h3>
+                  <p>Try adjusting your search terms or technology filter.</p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedTech('All');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </motion.div>
             )}
           </div>
-
-          {/* No Results Message */}
-          {!isLoading && filteredProjects.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <div className="text-muted-foreground mb-4">
-                <h3 className="text-xl font-semibold mb-2">No projects found</h3>
-                <p>Try adjusting your search terms or technology filter.</p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedTech('All');
-                }}
-              >
-                Clear Filters
-              </Button>
-            </motion.div>
-          )}
         </div>
       </main>
       <Footer />

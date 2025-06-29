@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Award, Calendar, ExternalLink } from 'lucide-react';
-import { certificates, categories } from '@/data/certificates';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import CertificateModal from '@/components/CertificateModal';
@@ -10,7 +9,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter, trackCertificateView, trackCertificateVerification } from '@/utils/analytics';
-import type { Certificate } from '@/data/certificates';
+import { useCertificates, useCertificateCategories } from '@/hooks/useSupabaseData';
+import type { Certificate } from '@/lib/supabase';
 
 const Certificates = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -19,11 +19,15 @@ const Certificates = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch data from Supabase
+  const { data: certificates, isLoading: isLoadingCertificates, error } = useCertificates();
+  const { data: categories } = useCertificateCategories();
+
   // Track user engagement
   useScrollTracking('certificates');
   useTimeTracking('certificates');
 
-  // Simulate loading state
+  // Simulate loading state for better UX
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -34,6 +38,8 @@ const Certificates = () => {
 
   // Filter certificates based on category and search term
   const filteredCertificates = useMemo(() => {
+    if (!certificates) return [];
+    
     return certificates.filter(cert => {
       const matchesCategory = selectedCategory === 'All' || cert.category === selectedCategory;
       const matchesSearch = searchTerm === '' || 
@@ -44,7 +50,7 @@ const Certificates = () => {
       
       return matchesCategory && matchesSearch;
     });
-  }, [selectedCategory, searchTerm]);
+  }, [certificates, selectedCategory, searchTerm]);
 
   // Track search usage
   useEffect(() => {
@@ -59,6 +65,7 @@ const Certificates = () => {
 
   // Get certificate count by category
   const getCategoryCount = (category: string) => {
+    if (!certificates) return 0;
     if (category === 'All') return certificates.length;
     return certificates.filter(cert => cert.category === category).length;
   };
@@ -78,6 +85,12 @@ const Certificates = () => {
     setIsModalOpen(false);
     setSelectedCertificate(null);
   };
+
+  if (error) {
+    console.error('Error loading certificates:', error);
+  }
+
+  const showLoading = isLoading || isLoadingCertificates;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -113,20 +126,20 @@ const Certificates = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full"
-                disabled={isLoading}
+                disabled={showLoading}
               />
             </div>
 
             {/* Category Filter Buttons */}
             <div className="flex flex-wrap justify-center gap-2">
-              {categories.map((category) => (
+              {(categories || ['All']).map((category) => (
                 <Button
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
                   onClick={() => handleCategoryFilter(category)}
                   className="relative"
-                  disabled={isLoading}
+                  disabled={showLoading}
                 >
                   <Filter size={14} className="mr-2" />
                   {category}
@@ -139,7 +152,7 @@ const Certificates = () => {
           </motion.div>
 
           {/* Results Summary */}
-          {!isLoading && (
+          {!showLoading && certificates && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -161,7 +174,7 @@ const Certificates = () => {
             transition={{ delay: 0.3 }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {isLoading ? (
+            {showLoading ? (
               // Show skeleton loaders
               Array.from({ length: 9 }).map((_, index) => (
                 <motion.div
@@ -173,7 +186,7 @@ const Certificates = () => {
                   <CertificateSkeleton />
                 </motion.div>
               ))
-            ) : (
+            ) : filteredCertificates.length > 0 ? (
               // Show actual certificates
               filteredCertificates.map((cert, index) => (
                 <motion.div
@@ -258,32 +271,30 @@ const Certificates = () => {
                   </div>
                 </motion.div>
               ))
+            ) : (
+              // No Results Message
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="col-span-full text-center py-12"
+              >
+                <div className="text-muted-foreground mb-4">
+                  <Award size={48} className="mx-auto mb-4 opacity-50" />
+                  <h3 className="text-xl font-semibold mb-2">No certificates found</h3>
+                  <p>Try adjusting your search terms or category filter.</p>
+                </div>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('All');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              </motion.div>
             )}
           </motion.div>
-
-          {/* No Results Message */}
-          {!isLoading && filteredCertificates.length === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center py-12"
-            >
-              <div className="text-muted-foreground mb-4">
-                <Award size={48} className="mx-auto mb-4 opacity-50" />
-                <h3 className="text-xl font-semibold mb-2">No certificates found</h3>
-                <p>Try adjusting your search terms or category filter.</p>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSearchTerm('');
-                  setSelectedCategory('All');
-                }}
-              >
-                Clear Filters
-              </Button>
-            </motion.div>
-          )}
         </div>
 
         {/* Certificate Modal */}
