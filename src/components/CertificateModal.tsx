@@ -120,7 +120,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ certificate, isOpen
                   {/* View Certificate Button */}
                   <div className="pt-4">
                     <a
-                      href={certificate.certificateUrl}
+                      href={certificate.certificate_url}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"

@@ -8,14 +8,14 @@ import Footer from '@/components/Footer';
 import ProjectSkeleton from '@/components/ProjectSkeleton';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter, trackProjectDemo, trackProjectCode, trackProjectView } from '@/utils/analytics';
-import { useProjects } from '@/hooks/useSupabaseData';
+import { useProjects } from '@/hooks/useLocalData';
 
 const Projects = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTech, setSelectedTech] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch projects from Supabase
+  // Fetch projects from local storage
   const { data: projects, isLoading: isLoadingProjects, error } = useProjects();
 
   // Track user engagement

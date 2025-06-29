@@ -9,7 +9,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter } from '@/utils/analytics';
-import { useArticles, useArticleCategories } from '@/hooks/useSupabaseData';
+import { useArticles, useArticleCategories } from '@/hooks/useLocalData';
 
 // Helper function to format date
 const formatDate = (dateString: string): string => {
@@ -26,7 +26,7 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch data from Supabase
+  // Fetch data from local storage
   const { data: articles, isLoading: isLoadingArticles, error } = useArticles();
   const { data: categories } = useArticleCategories();
 

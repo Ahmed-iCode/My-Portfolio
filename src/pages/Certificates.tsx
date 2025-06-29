@@ -9,8 +9,8 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter, trackCertificateView, trackCertificateVerification } from '@/utils/analytics';
-import { useCertificates, useCertificateCategories } from '@/hooks/useSupabaseData';
-import type { Certificate } from '@/lib/supabase';
+import { useCertificates, useCertificateCategories } from '@/hooks/useLocalData';
+import type { Certificate } from '@/data/certificates';
 
 const Certificates = () => {
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -19,7 +19,7 @@ const Certificates = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch data from Supabase
+  // Fetch data from local storage
   const { data: certificates, isLoading: isLoadingCertificates, error } = useCertificates();
   const { data: categories } = useCertificateCategories();
 

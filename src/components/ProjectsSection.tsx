@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { ExternalLink, Github, ArrowRight } from 'lucide-react';
-import { useFeaturedProjects } from '@/hooks/useSupabaseData';
+import { useFeaturedProjects } from '@/hooks/useLocalData';
 import ProjectSkeleton from '@/components/ProjectSkeleton';
 
 const ProjectsSection: React.FC = () => {

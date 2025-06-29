@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Award, Calendar, ExternalLink, ArrowRight } from 'lucide-react';
-import { useFeaturedCertificates } from '@/hooks/useSupabaseData';
+import { useFeaturedCertificates } from '@/hooks/useLocalData';
 import CertificateSkeleton from '@/components/CertificateSkeleton';
 
 const CertificatesSection: React.FC = () => {

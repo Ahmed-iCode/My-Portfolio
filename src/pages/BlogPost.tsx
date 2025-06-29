@@ -11,7 +11,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackArticleView, trackArticleShare } from '@/utils/analytics';
-import { useArticleBySlug, useArticles } from '@/hooks/useSupabaseData';
+import { useArticleBySlug, useArticles } from '@/hooks/useLocalData';
 
 // Helper function to format date
 const formatDate = (dateString: string): string => {
