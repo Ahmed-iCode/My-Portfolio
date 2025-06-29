@@ -11,7 +11,6 @@ import {
   Building,
   Star,
   StarOff,
-  Eye,
   Save,
   X
 } from 'lucide-react';
@@ -25,14 +24,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useToast } from '@/hooks/use-toast';
-import { useCertificates } from '@/hooks/useSupabaseData';
-import { supabase, type Certificate } from '@/lib/supabase';
-import { useQueryClient } from '@tanstack/react-query';
+import { useCertificates } from '@/hooks/useLocalData';
+import { Certificate } from '@/data/certificates';
 
 const CertificatesManager = () => {
-  const { data: certificates, isLoading } = useCertificates();
+  const { 
+    data: certificates, 
+    isLoading, 
+    addCertificate, 
+    updateCertificate, 
+    deleteCertificate, 
+    toggleFeatured 
+  } = useCertificates();
+  
   const { toast } = useToast();
-  const queryClient = useQueryClient();
   
   const [searchTerm, setSearchTerm] = useState('');
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -137,41 +142,25 @@ const CertificatesManager = () => {
         category: formData.category,
         skills: formData.skills.split(',').map(s => s.trim()).filter(s => s),
         tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
-        description: formData.description.trim() || null,
+        description: formData.description.trim() || undefined,
         featured: formData.featured,
       };
 
-      let result;
-
       if (editingCertificate) {
         // Update existing certificate
-        result = await supabase
-          .from('certificates')
-          .update(certificateData)
-          .eq('id', editingCertificate.id)
-          .select();
+        updateCertificate(editingCertificate.id, certificateData);
+        toast({
+          title: "Certificate updated!",
+          description: "The certificate has been updated successfully.",
+        });
       } else {
-        // Insert new certificate
-        result = await supabase
-          .from('certificates')
-          .insert([certificateData])
-          .select();
+        // Add new certificate
+        addCertificate(certificateData);
+        toast({
+          title: "Certificate added!",
+          description: "The new certificate has been added to your portfolio.",
+        });
       }
-
-      if (result.error) {
-        console.error('Supabase error:', result.error);
-        throw new Error(result.error.message || 'Failed to save certificate');
-      }
-
-      // Invalidate and refetch certificates
-      queryClient.invalidateQueries({ queryKey: ['certificates'] });
-
-      toast({
-        title: editingCertificate ? "Certificate updated!" : "Certificate added!",
-        description: editingCertificate 
-          ? "The certificate has been updated successfully."
-          : "The new certificate has been added to your portfolio.",
-      });
 
       // Reset form and close dialog
       resetForm();
@@ -194,63 +183,33 @@ const CertificatesManager = () => {
 
   const handleDelete = async (certificateId: string) => {
     try {
-      const { error } = await supabase
-        .from('certificates')
-        .delete()
-        .eq('id', certificateId);
-
-      if (error) {
-        console.error('Delete error:', error);
-        throw new Error(error.message || 'Failed to delete certificate');
-      }
-
-      // Invalidate and refetch certificates
-      queryClient.invalidateQueries({ queryKey: ['certificates'] });
-
+      deleteCertificate(certificateId);
       toast({
         title: "Certificate deleted!",
         description: "The certificate has been removed from your portfolio.",
       });
-
     } catch (error) {
       console.error('Error deleting certificate:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete the certificate. Please try again.';
-      
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Failed to delete the certificate. Please try again.",
         variant: "destructive",
       });
     }
   };
 
-  const toggleFeatured = async (certificate: Certificate) => {
+  const handleToggleFeatured = async (certificate: Certificate) => {
     try {
-      const { error } = await supabase
-        .from('certificates')
-        .update({ featured: !certificate.featured })
-        .eq('id', certificate.id);
-
-      if (error) {
-        console.error('Toggle featured error:', error);
-        throw new Error(error.message || 'Failed to update featured status');
-      }
-
-      // Invalidate and refetch certificates
-      queryClient.invalidateQueries({ queryKey: ['certificates'] });
-
+      toggleFeatured(certificate.id);
       toast({
         title: certificate.featured ? "Removed from featured" : "Added to featured",
         description: `Certificate ${certificate.featured ? 'removed from' : 'added to'} featured section.`,
       });
-
     } catch (error) {
       console.error('Error updating featured status:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update featured status. Please try again.';
-      
       toast({
         title: "Error",
-        description: errorMessage,
+        description: "Failed to update featured status. Please try again.",
         variant: "destructive",
       });
     }
@@ -526,7 +485,7 @@ const CertificatesManager = () => {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => toggleFeatured(certificate)}
+                        onClick={() => handleToggleFeatured(certificate)}
                         className="gap-1"
                       >
                         {certificate.featured ? (

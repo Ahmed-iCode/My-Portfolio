@@ -6,9 +6,7 @@ import {
   FolderOpen, 
   FileText, 
   Plus,
-  Settings,
   BarChart3,
-  Users,
   Shield
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
-import { useCertificates, useProjects, useArticles } from '@/hooks/useSupabaseData';
+import { useCertificates, useProjects, useArticles } from '@/hooks/useLocalData';
 import CertificatesManager from '@/components/admin/CertificatesManager';
 
 const AdminDashboard = () => {
@@ -81,7 +79,7 @@ const AdminDashboard = () => {
             </div>
             <div>
               <h1 className="text-xl font-bold">Admin Dashboard</h1>
-              <p className="text-sm text-muted-foreground">Portfolio Content Management</p>
+              <p className="text-sm text-muted-foreground">Portfolio Content Management (Local Mode)</p>
             </div>
           </div>
           
@@ -124,9 +122,22 @@ const AdminDashboard = () => {
               <div>
                 <h2 className="text-2xl font-bold mb-2">Dashboard Overview</h2>
                 <p className="text-muted-foreground">
-                  Welcome to your portfolio content management system. Here you can manage all your certificates, projects, and blog articles.
+                  Welcome to your local portfolio content management system. All data is stored locally in your browser.
                 </p>
               </div>
+
+              {/* Local Mode Notice */}
+              <Card className="border-amber-200 bg-amber-50 dark:bg-amber-950 dark:border-amber-800">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                    <Shield className="w-4 h-4" />
+                    <span className="font-medium">Local Mode Active</span>
+                  </div>
+                  <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
+                    Your data is stored locally in your browser. Changes will persist until you clear your browser data.
+                  </p>
+                </CardContent>
+              </Card>
 
               {/* Stats Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
