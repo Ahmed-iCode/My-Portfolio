@@ -116,9 +116,7 @@ const Footer = () => {
               viewport={{ once: true }}
               className="text-sm text-muted-foreground text-center sm:text-left"
             >
-              &copy; {currentYear} Ahmed Samir. Made with{' '}
-              <Heart className="inline w-4 h-4 text-red-500 mx-1" />
-              using React & TypeScript.
+              &copy; {currentYear} Ahmed Samir
             </motion.p>
             
             <motion.button
