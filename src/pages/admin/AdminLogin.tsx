@@ -125,16 +125,6 @@ const AdminLogin = () => {
           </CardContent>
         </Card>
 
-        {/* Demo hint for development */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-4 text-center text-xs text-muted-foreground bg-muted/50 rounded-lg p-3"
-        >
-          <p>💡 Demo Password: <code className="bg-background px-1 rounded">ahmedCMS2025</code></p>
-        </motion.div>
-      </motion.div>
     </div>
   );
 };
