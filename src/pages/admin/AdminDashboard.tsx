@@ -17,6 +17,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useCertificates, useProjects, useArticles } from '@/hooks/useLocalData';
 import CertificatesManager from '@/components/admin/CertificatesManager';
+import ProjectsManager from '@/components/admin/ProjectsManager';
+import ArticlesManager from '@/components/admin/ArticlesManager';
 import DataExporter from '@/components/admin/DataExporter';
 
 const AdminDashboard = () => {
@@ -239,7 +241,7 @@ const AdminDashboard = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {certificates?.slice(0, 3).map((cert) => (
+                    {certificates?.slice(0, 2).map((cert) => (
                       <div key={cert.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                         <Award className="w-4 h-4 text-blue-600" />
                         <div className="flex-1">
@@ -262,6 +264,19 @@ const AdminDashboard = () => {
                         </span>
                       </div>
                     ))}
+
+                    {articles?.slice(0, 1).map((article) => (
+                      <div key={article.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+                        <FileText className="w-4 h-4 text-purple-600" />
+                        <div className="flex-1">
+                          <p className="font-medium">{article.title}</p>
+                          <p className="text-sm text-muted-foreground">Blog Article</p>
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(article.published_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
@@ -275,62 +290,12 @@ const AdminDashboard = () => {
 
           {/* Projects Tab */}
           <TabsContent value="projects">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Projects Management</CardTitle>
-                  <CardDescription>
-                    Coming in Phase 2 - Manage your project portfolio
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <FolderOpen className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Projects Management</h3>
-                    <p className="text-muted-foreground mb-4">
-                      This feature will be available in the next phase of development.
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      You'll be able to add, edit, and manage your project portfolio here.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <ProjectsManager />
           </TabsContent>
 
           {/* Articles Tab */}
           <TabsContent value="articles">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="space-y-6"
-            >
-              <Card>
-                <CardHeader>
-                  <CardTitle>Articles Management</CardTitle>
-                  <CardDescription>
-                    Coming in Phase 2 - Manage your blog content
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <FileText className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Blog Management</h3>
-                    <p className="text-muted-foreground mb-4">
-                      This feature will be available in the next phase of development.
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      You'll be able to create, edit, and publish blog articles here.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
+            <ArticlesManager />
           </TabsContent>
 
           {/* Export Tab */}
