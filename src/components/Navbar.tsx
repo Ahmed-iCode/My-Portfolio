@@ -3,12 +3,13 @@ import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import ThemeToggle from './ThemeToggle';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsOpen(!isOpen);
 
@@ -26,6 +27,18 @@ const Navbar = () => {
     setIsOpen(false);
   }, [location]);
 
+  // Handle scrolling to section after navigation
+  useEffect(() => {
+    if (location.pathname === '/' && location.hash) {
+      const element = document.querySelector(location.hash);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+      }
+    }
+  }, [location]);
+
   const navLinks = [
     { title: 'Home', url: '/', external: false },
     { title: 'Projects', url: '/projects', external: false },
@@ -40,11 +53,21 @@ const Navbar = () => {
     return location.pathname === url;
   };
 
-  const handleNavClick = (url: string) => {
+  const handleNavClick = (url: string, e: React.MouseEvent) => {
     if (url.startsWith('/#')) {
-      const element = document.querySelector(url.substring(1));
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      const sectionId = url.substring(2); // Remove '/#'
+      
+      if (location.pathname === '/') {
+        // Already on homepage, just scroll to section
+        e.preventDefault();
+        const element = document.querySelector(`#${sectionId}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // On different page, navigate to homepage with hash
+        e.preventDefault();
+        navigate(`/#${sectionId}`);
       }
     }
     setIsOpen(false);
@@ -84,14 +107,9 @@ const Navbar = () => {
               <a 
                 key={index} 
                 href={link.url}
-                onClick={(e) => {
-                  if (link.url.startsWith('/#')) {
-                    e.preventDefault();
-                    handleNavClick(link.url);
-                  }
-                }}
+                onClick={(e) => handleNavClick(link.url, e)}
                 className={cn(
-                  "nav-link transition-colors duration-300",
+                  "nav-link transition-colors duration-300 cursor-pointer",
                   isActiveLink(link.url) ? "text-primary" : "text-foreground hover:text-primary"
                 )}
                 aria-current={isActiveLink(link.url) ? "page" : undefined}
@@ -148,16 +166,9 @@ const Navbar = () => {
               <a 
                 key={index} 
                 href={link.url}
-                onClick={(e) => {
-                  if (link.url.startsWith('/#')) {
-                    e.preventDefault();
-                    handleNavClick(link.url);
-                  } else {
-                    setIsOpen(false);
-                  }
-                }}
+                onClick={(e) => handleNavClick(link.url, e)}
                 className={cn(
-                  "text-lg py-2 border-b border-muted transition-colors",
+                  "text-lg py-2 border-b border-muted transition-colors cursor-pointer",
                   isActiveLink(link.url) ? "text-primary font-medium" : "text-foreground hover:text-primary"
                 )}
                 aria-current={isActiveLink(link.url) ? "page" : undefined}
