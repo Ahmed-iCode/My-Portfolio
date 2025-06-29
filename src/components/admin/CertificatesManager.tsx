@@ -108,6 +108,26 @@ const CertificatesManager = () => {
     setIsSubmitting(true);
 
     try {
+      // Validate required fields
+      if (!formData.title.trim()) {
+        throw new Error('Title is required');
+      }
+      if (!formData.issuer.trim()) {
+        throw new Error('Issuer is required');
+      }
+      if (!formData.date.trim()) {
+        throw new Error('Date is required');
+      }
+      if (!formData.image.trim()) {
+        throw new Error('Image URL is required');
+      }
+      if (!formData.certificate_url.trim()) {
+        throw new Error('Certificate URL is required');
+      }
+      if (!formData.category) {
+        throw new Error('Category is required');
+      }
+
       const certificateData = {
         title: formData.title.trim(),
         issuer: formData.issuer.trim(),
@@ -121,24 +141,27 @@ const CertificatesManager = () => {
         featured: formData.featured,
       };
 
-      let error;
+      let result;
 
       if (editingCertificate) {
         // Update existing certificate
-        const { error: updateError } = await supabase
+        result = await supabase
           .from('certificates')
           .update(certificateData)
-          .eq('id', editingCertificate.id);
-        error = updateError;
+          .eq('id', editingCertificate.id)
+          .select();
       } else {
         // Insert new certificate
-        const { error: insertError } = await supabase
+        result = await supabase
           .from('certificates')
-          .insert([certificateData]);
-        error = insertError;
+          .insert([certificateData])
+          .select();
       }
 
-      if (error) throw error;
+      if (result.error) {
+        console.error('Supabase error:', result.error);
+        throw new Error(result.error.message || 'Failed to save certificate');
+      }
 
       // Invalidate and refetch certificates
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
@@ -157,9 +180,11 @@ const CertificatesManager = () => {
 
     } catch (error) {
       console.error('Error saving certificate:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to save the certificate. Please try again.';
+      
       toast({
         title: "Error",
-        description: "Failed to save the certificate. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -174,7 +199,10 @@ const CertificatesManager = () => {
         .delete()
         .eq('id', certificateId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Delete error:', error);
+        throw new Error(error.message || 'Failed to delete certificate');
+      }
 
       // Invalidate and refetch certificates
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
@@ -186,9 +214,11 @@ const CertificatesManager = () => {
 
     } catch (error) {
       console.error('Error deleting certificate:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to delete the certificate. Please try again.';
+      
       toast({
         title: "Error",
-        description: "Failed to delete the certificate. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -201,7 +231,10 @@ const CertificatesManager = () => {
         .update({ featured: !certificate.featured })
         .eq('id', certificate.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Toggle featured error:', error);
+        throw new Error(error.message || 'Failed to update featured status');
+      }
 
       // Invalidate and refetch certificates
       queryClient.invalidateQueries({ queryKey: ['certificates'] });
@@ -213,9 +246,11 @@ const CertificatesManager = () => {
 
     } catch (error) {
       console.error('Error updating featured status:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update featured status. Please try again.';
+      
       toast({
         title: "Error",
-        description: "Failed to update featured status. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
