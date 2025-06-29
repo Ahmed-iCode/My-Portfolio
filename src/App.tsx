@@ -10,6 +10,9 @@ import Projects from "./pages/Projects";
 import Certificates from "./pages/Certificates";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ProtectedRoute from "./components/admin/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +27,15 @@ const AppWithTracking = () => {
       <Route path="/certificates" element={<Certificates />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
+      <Route path="/admin" element={<AdminLogin />} />
+      <Route 
+        path="/admin/dashboard" 
+        element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } 
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
