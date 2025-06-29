@@ -70,22 +70,6 @@ const HeroSection = () => {
               <Mail className="mr-2" size={20} />
               Contact Me
             </Button>
-            <Button 
-              size="lg" 
-              variant="ghost" 
-              className="w-full sm:w-auto text-lg px-8 py-3 h-auto"
-              asChild
-            >
-              <a 
-                href="/resume.pdf" 
-                download="Ahmed_Samir_Resume.pdf"
-                aria-label="Download Ahmed Samir's Resume"
-                onClick={handleCVDownload}
-              >
-                <Download className="mr-2" size={20} />
-                Download CV
-              </a>
-            </Button>
           </motion.div>
 
           {/* Quick Stats */}
