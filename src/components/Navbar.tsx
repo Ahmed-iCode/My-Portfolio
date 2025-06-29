@@ -43,6 +43,7 @@ const Navbar = () => {
     { title: 'Home', url: '/', external: false },
     { title: 'Projects', url: '/projects', external: false },
     { title: 'Certificates', url: '/certificates', external: false },
+    { title: 'Blog', url: '/blog', external: false },
     { title: 'Skills', url: '/#skills', external: false },
     { title: 'Contact', url: '/#contact', external: false },
   ];
@@ -50,7 +51,7 @@ const Navbar = () => {
   const isActiveLink = (url: string) => {
     if (url === '/') return location.pathname === '/';
     if (url.startsWith('/#')) return location.pathname === '/' && location.hash === url.substring(1);
-    return location.pathname === url;
+    return location.pathname === url || (url === '/blog' && location.pathname.startsWith('/blog'));
   };
 
   const handleNavClick = (url: string, e: React.MouseEvent) => {

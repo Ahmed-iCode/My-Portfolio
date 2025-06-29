@@ -123,6 +123,57 @@
     overflow: hidden;
   }
 
+  /* Blog-specific styles */
+  .prose {
+    @apply text-foreground;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    @apply text-foreground font-semibold;
+  }
+
+  .prose p {
+    @apply text-foreground/90 leading-relaxed;
+  }
+
+  .prose code {
+    @apply bg-muted text-foreground px-1.5 py-0.5 rounded text-sm font-mono;
+  }
+
+  .prose pre {
+    @apply bg-muted text-foreground p-4 rounded-lg overflow-x-auto;
+  }
+
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+
+  .prose blockquote {
+    @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
+  }
+
+  .prose ul,
+  .prose ol {
+    @apply text-foreground/90;
+  }
+
+  .prose li {
+    @apply mb-1;
+  }
+
+  .prose strong {
+    @apply text-foreground font-semibold;
+  }
+
+  .prose a {
+    @apply text-primary hover:text-primary/80 transition-colors;
+  }
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
