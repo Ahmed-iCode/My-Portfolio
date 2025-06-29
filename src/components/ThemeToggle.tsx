@@ -1,7 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { Moon, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { trackThemeChange } from '@/utils/analytics';
 
 const ThemeToggle = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -21,6 +21,8 @@ const ThemeToggle = () => {
   }, []);
 
   const toggleTheme = () => {
+    const newTheme = isDarkMode ? 'light' : 'dark';
+    
     if (isDarkMode) {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
@@ -28,7 +30,11 @@ const ThemeToggle = () => {
       document.documentElement.classList.add('dark');
       localStorage.setItem('theme', 'dark');
     }
+    
     setIsDarkMode(!isDarkMode);
+    
+    // Track theme change
+    trackThemeChange(newTheme);
   };
 
   return (

@@ -2,6 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Calendar, Award, Tag } from 'lucide-react';
 import { Certificate } from '@/data/certificates';
+import { trackCertificateVerification } from '@/utils/analytics';
 
 interface CertificateModalProps {
   certificate: Certificate | null;
@@ -11,6 +12,10 @@ interface CertificateModalProps {
 
 const CertificateModal: React.FC<CertificateModalProps> = ({ certificate, isOpen, onClose }) => {
   if (!certificate) return null;
+
+  const handleVerificationClick = () => {
+    trackCertificateVerification(certificate.title, certificate.issuer);
+  };
 
   return (
     <AnimatePresence>
@@ -119,6 +124,7 @@ const CertificateModal: React.FC<CertificateModalProps> = ({ certificate, isOpen
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+                      onClick={handleVerificationClick}
                     >
                       <ExternalLink size={16} />
                       View Original Certificate

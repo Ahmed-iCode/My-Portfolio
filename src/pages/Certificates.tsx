@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Award, Calendar, ExternalLink } from 'lucide-react';
 import { certificates, categories } from '@/data/certificates';
@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import CertificateModal from '@/components/CertificateModal';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
+import { trackSearch, trackFilter, trackCertificateView, trackCertificateVerification } from '@/utils/analytics';
 import type { Certificate } from '@/data/certificates';
 
 const Certificates = () => {
@@ -14,6 +16,10 @@ const Certificates = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCertificate, setSelectedCertificate] = useState<Certificate | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Track user engagement
+  useScrollTracking('certificates');
+  useTimeTracking('certificates');
 
   // Filter certificates based on category and search term
   const filteredCertificates = useMemo(() => {
@@ -29,6 +35,17 @@ const Certificates = () => {
     });
   }, [selectedCategory, searchTerm]);
 
+  // Track search usage
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      const timeoutId = setTimeout(() => {
+        trackSearch(searchTerm, 'certificates', filteredCertificates.length);
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchTerm, filteredCertificates.length]);
+
   // Get certificate count by category
   const getCategoryCount = (category: string) => {
     if (category === 'All') return certificates.length;
@@ -38,6 +55,12 @@ const Certificates = () => {
   const handleCertificateClick = (certificate: Certificate) => {
     setSelectedCertificate(certificate);
     setIsModalOpen(true);
+    trackCertificateView(certificate.title, certificate.issuer);
+  };
+
+  const handleCategoryFilter = (category: string) => {
+    setSelectedCategory(category);
+    trackFilter('category', category, 'certificates');
   };
 
   const closeModal = () => {
@@ -89,7 +112,7 @@ const Certificates = () => {
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => handleCategoryFilter(category)}
                   className="relative"
                 >
                   <Filter size={14} className="mr-2" />

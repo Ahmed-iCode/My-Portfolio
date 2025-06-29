@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, ExternalLink, Github, Filter } from 'lucide-react';
 import { projects } from '@/data/projects';
@@ -6,10 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
+import { trackSearch, trackFilter, trackProjectDemo, trackProjectCode, trackProjectView } from '@/utils/analytics';
 
 const Projects = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTech, setSelectedTech] = useState('All');
+
+  // Track user engagement
+  useScrollTracking('projects');
+  useTimeTracking('projects');
 
   // Get all unique technologies
   const allTechnologies = ['All', ...Array.from(new Set(projects.flatMap(project => project.techStack)))];
@@ -25,6 +31,34 @@ const Projects = () => {
     
     return matchesSearch && matchesTech;
   });
+
+  // Track search usage
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      const timeoutId = setTimeout(() => {
+        trackSearch(searchTerm, 'projects', filteredProjects.length);
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchTerm, filteredProjects.length]);
+
+  const handleTechFilter = (tech: string) => {
+    setSelectedTech(tech);
+    trackFilter('technology', tech, 'projects');
+  };
+
+  const handleProjectDemo = (project: any) => {
+    trackProjectDemo(project.title, project.demoLink);
+  };
+
+  const handleProjectCode = (project: any) => {
+    trackProjectCode(project.title, project.githubLink);
+  };
+
+  const handleProjectView = (project: any) => {
+    trackProjectView(project.title, project.techStack);
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -70,7 +104,7 @@ const Projects = () => {
                   key={tech}
                   variant={selectedTech === tech ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedTech(tech)}
+                  onClick={() => handleTechFilter(tech)}
                   className="text-xs"
                 >
                   <Filter size={12} className="mr-1" />
@@ -105,6 +139,7 @@ const Projects = () => {
                 viewport={{ once: true }}
                 whileHover={{ y: -5, transition: { duration: 0.2 } }}
                 className="group bg-card rounded-xl shadow-lg overflow-hidden border hover:shadow-xl transition-all duration-300"
+                onClick={() => handleProjectView(project)}
               >
                 <div className="relative overflow-hidden">
                   <img
@@ -136,7 +171,10 @@ const Projects = () => {
                       <span
                         key={i}
                         className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-medium cursor-pointer hover:bg-secondary/20 transition-colors"
-                        onClick={() => setSelectedTech(tech)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleTechFilter(tech);
+                        }}
                       >
                         {tech}
                       </span>
@@ -151,6 +189,10 @@ const Projects = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
                         aria-label={`View ${project.title} live demo`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleProjectDemo(project);
+                        }}
                       >
                         <ExternalLink size={16} className="mr-1" />
                         Live Demo
@@ -161,6 +203,10 @@ const Projects = () => {
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
                         aria-label={`View ${project.title} source code`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleProjectCode(project);
+                        }}
                       >
                         <Github size={16} className="mr-1" />
                         Code

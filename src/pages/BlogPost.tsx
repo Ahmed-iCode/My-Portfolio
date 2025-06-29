@@ -6,15 +6,24 @@ import { articles, formatDate } from '@/data/articles';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
+import { trackArticleView, trackArticleShare } from '@/utils/analytics';
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const article = articles.find(a => a.slug === slug);
 
+  // Track user engagement
+  useScrollTracking(`blog-post-${slug}`);
+  useTimeTracking(`blog-post-${slug}`);
+
   // Update document title and meta tags
   useEffect(() => {
     if (article) {
       document.title = article.seo.metaTitle || `${article.title} - Ahmed Samir`;
+      
+      // Track article view
+      trackArticleView(article.title, article.category, article.readingTime);
       
       // Update meta description
       const metaDescription = document.querySelector('meta[name="description"]');
@@ -54,12 +63,14 @@ const BlogPost = () => {
     if (navigator.share) {
       try {
         await navigator.share(shareData);
+        trackArticleShare(article.title, 'native_share');
       } catch (err) {
         console.log('Error sharing:', err);
       }
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
+      trackArticleShare(article.title, 'clipboard');
       // You could show a toast notification here
     }
   };

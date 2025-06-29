@@ -6,8 +6,13 @@ import CertificatesSection from '@/components/CertificatesSection';
 import SkillsSection from '@/components/SkillsSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 
 const Index = () => {
+  // Track user engagement on homepage
+  useScrollTracking('homepage');
+  useTimeTracking('homepage');
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />

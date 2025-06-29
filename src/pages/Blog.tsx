@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Clock, Calendar, User, ArrowRight, Tag } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,10 +7,16 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
+import { trackSearch, trackFilter } from '@/utils/analytics';
 
 const Blog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+
+  // Track user engagement
+  useScrollTracking('blog');
+  useTimeTracking('blog');
 
   // Filter articles based on search and category
   const filteredArticles = useMemo(() => {
@@ -25,10 +31,26 @@ const Blog = () => {
     });
   }, [selectedCategory, searchTerm]);
 
+  // Track search usage
+  useEffect(() => {
+    if (searchTerm.length > 2) {
+      const timeoutId = setTimeout(() => {
+        trackSearch(searchTerm, 'blog', filteredArticles.length);
+      }, 1000);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchTerm, filteredArticles.length]);
+
   // Get article count by category
   const getCategoryCount = (category: string) => {
     if (category === 'All') return articles.length;
     return articles.filter(article => article.category === category).length;
+  };
+
+  const handleCategoryFilter = (category: string) => {
+    setSelectedCategory(category);
+    trackFilter('category', category, 'blog');
   };
 
   // Separate featured and regular articles
@@ -79,7 +101,7 @@ const Blog = () => {
                   key={category}
                   variant={selectedCategory === category ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setSelectedCategory(category)}
+                  onClick={() => handleCategoryFilter(category)}
                   className="relative"
                 >
                   <Filter size={14} className="mr-2" />

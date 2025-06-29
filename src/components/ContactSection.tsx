@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { trackContactForm, trackExternalLink } from '@/utils/analytics';
 import emailjs from 'emailjs-com';
 
 const ContactSection = () => {
@@ -41,6 +42,9 @@ const ContactSection = () => {
         'EScOu4u49V1sLyuUZ'
       );
       
+      // Track successful form submission
+      trackContactForm('contact_form', true);
+      
       toast({
         title: "Message sent successfully!",
         description: "Thank you for your message. I'll get back to you as soon as possible.",
@@ -54,6 +58,10 @@ const ContactSection = () => {
       });
     } catch (error) {
       console.error('Email sending failed:', error);
+      
+      // Track failed form submission
+      trackContactForm('contact_form', false);
+      
       toast({
         title: "Failed to send message",
         description: "Please try again later or contact me directly via email.",
@@ -62,6 +70,10 @@ const ContactSection = () => {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleSocialClick = (platform: string, url: string) => {
+    trackExternalLink(url, platform, 'contact_section');
   };
 
   const contactInfo = [
@@ -262,6 +274,7 @@ const ContactSection = () => {
                         <a 
                           href={info.href} 
                           className="text-primary hover:text-primary/80 transition-colors font-medium"
+                          onClick={() => info.href && trackExternalLink(info.href, info.label, 'contact_info')}
                         >
                           {info.value}
                         </a>
@@ -293,6 +306,7 @@ const ContactSection = () => {
                       aria-label={`Follow Ahmed Samir on ${social.label}`}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
+                      onClick={() => handleSocialClick(social.label, social.href)}
                     >
                       {social.icon}
                     </motion.a>

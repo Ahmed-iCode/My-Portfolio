@@ -2,13 +2,19 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowDown, Download, Mail } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { trackCVDownload, trackNavigation } from '@/utils/analytics';
 
 const HeroSection = () => {
   const scrollToSection = (sectionId: string) => {
     const element = document.querySelector(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      trackNavigation('hero', sectionId.replace('#', ''), 'scroll_button');
     }
+  };
+
+  const handleCVDownload = () => {
+    trackCVDownload();
   };
 
   return (
@@ -74,6 +80,7 @@ const HeroSection = () => {
                 href="/resume.pdf" 
                 download="Ahmed_Samir_Resume.pdf"
                 aria-label="Download Ahmed Samir's Resume"
+                onClick={handleCVDownload}
               >
                 <Download className="mr-2" size={20} />
                 Download CV
