@@ -2,6 +2,10 @@ import React, { useEffect } from 'react';
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Calendar, Clock, User, ArrowLeft, Tag, Share2, ExternalLink } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
 import { articles, formatDate } from '@/data/articles';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
@@ -75,88 +79,68 @@ const BlogPost = () => {
     }
   };
 
-  // Convert markdown-style content to JSX (basic implementation)
-  const renderContent = (content: string) => {
-    const lines = content.split('\n');
-    const elements: JSX.Element[] = [];
-    let currentElement: string[] = [];
-    let inCodeBlock = false;
-    let codeLanguage = '';
-
-    lines.forEach((line, index) => {
-      // Code blocks
-      if (line.startsWith('```')) {
-        if (inCodeBlock) {
-          // End code block
-          elements.push(
-            <pre key={index} className="bg-muted p-4 rounded-lg overflow-x-auto my-4">
-              <code className={`language-${codeLanguage}`}>
-                {currentElement.join('\n')}
-              </code>
-            </pre>
-          );
-          currentElement = [];
-          inCodeBlock = false;
-          codeLanguage = '';
-        } else {
-          // Start code block
-          inCodeBlock = true;
-          codeLanguage = line.replace('```', '');
-        }
-        return;
-      }
-
-      if (inCodeBlock) {
-        currentElement.push(line);
-        return;
-      }
-
-      // Headers
-      if (line.startsWith('# ')) {
-        elements.push(
-          <h1 key={index} className="text-3xl font-bold mt-8 mb-4 first:mt-0">
-            {line.replace('# ', '')}
-          </h1>
-        );
-      } else if (line.startsWith('## ')) {
-        elements.push(
-          <h2 key={index} className="text-2xl font-semibold mt-6 mb-3">
-            {line.replace('## ', '')}
-          </h2>
-        );
-      } else if (line.startsWith('### ')) {
-        elements.push(
-          <h3 key={index} className="text-xl font-semibold mt-5 mb-2">
-            {line.replace('### ', '')}
-          </h3>
-        );
-      } else if (line.trim() === '') {
-        // Empty line
-        elements.push(<br key={index} />);
-      } else if (line.startsWith('- ')) {
-        // List item (basic implementation)
-        elements.push(
-          <li key={index} className="ml-4 mb-1">
-            {line.replace('- ', '')}
-          </li>
-        );
-      } else {
-        // Regular paragraph
-        const processedLine = line
-          .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          .replace(/`(.*?)`/g, '<code class="bg-muted px-1 py-0.5 rounded text-sm">$1</code>');
-        
-        elements.push(
-          <p 
-            key={index} 
-            className="mb-4 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: processedLine }}
-          />
-        );
-      }
-    });
-
-    return elements;
+  // Custom components for ReactMarkdown
+  const markdownComponents = {
+    code({ node, inline, className, children, ...props }: any) {
+      const match = /language-(\w+)/.exec(className || '');
+      return !inline && match ? (
+        <SyntaxHighlighter
+          style={oneDark}
+          language={match[1]}
+          PreTag="div"
+          className="rounded-lg my-4"
+          {...props}
+        >
+          {String(children).replace(/\n$/, '')}
+        </SyntaxHighlighter>
+      ) : (
+        <code className="bg-muted px-1.5 py-0.5 rounded text-sm font-mono" {...props}>
+          {children}
+        </code>
+      );
+    },
+    h1: ({ children }: any) => (
+      <h1 className="text-3xl font-bold mt-8 mb-4 first:mt-0">{children}</h1>
+    ),
+    h2: ({ children }: any) => (
+      <h2 className="text-2xl font-semibold mt-6 mb-3">{children}</h2>
+    ),
+    h3: ({ children }: any) => (
+      <h3 className="text-xl font-semibold mt-5 mb-2">{children}</h3>
+    ),
+    p: ({ children }: any) => (
+      <p className="mb-4 leading-relaxed">{children}</p>
+    ),
+    ul: ({ children }: any) => (
+      <ul className="list-disc list-inside mb-4 space-y-1">{children}</ul>
+    ),
+    ol: ({ children }: any) => (
+      <ol className="list-decimal list-inside mb-4 space-y-1">{children}</ol>
+    ),
+    li: ({ children }: any) => (
+      <li className="mb-1">{children}</li>
+    ),
+    blockquote: ({ children }: any) => (
+      <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4">
+        {children}
+      </blockquote>
+    ),
+    a: ({ href, children }: any) => (
+      <a 
+        href={href} 
+        className="text-primary hover:text-primary/80 transition-colors underline"
+        target={href?.startsWith('http') ? '_blank' : undefined}
+        rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}
+      >
+        {children}
+      </a>
+    ),
+    strong: ({ children }: any) => (
+      <strong className="font-semibold">{children}</strong>
+    ),
+    em: ({ children }: any) => (
+      <em className="italic">{children}</em>
+    ),
   };
 
   return (
@@ -255,9 +239,14 @@ const BlogPost = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="prose prose-lg max-w-none dark:prose-invert prose-headings:text-foreground prose-p:text-foreground prose-strong:text-foreground prose-code:text-foreground prose-pre:bg-muted prose-pre:text-foreground"
+            className="prose prose-lg max-w-none dark:prose-invert"
           >
-            {renderContent(article.content)}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={markdownComponents}
+            >
+              {article.content}
+            </ReactMarkdown>
           </motion.div>
 
           {/* Article Footer */}

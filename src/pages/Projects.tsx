@@ -6,16 +6,27 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import ProjectSkeleton from '@/components/ProjectSkeleton';
 import { useScrollTracking, useTimeTracking } from '@/hooks/usePageTracking';
 import { trackSearch, trackFilter, trackProjectDemo, trackProjectCode, trackProjectView } from '@/utils/analytics';
 
 const Projects = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTech, setSelectedTech] = useState('All');
+  const [isLoading, setIsLoading] = useState(true);
 
   // Track user engagement
   useScrollTracking('projects');
   useTimeTracking('projects');
+
+  // Simulate loading state
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Get all unique technologies
   const allTechnologies = ['All', ...Array.from(new Set(projects.flatMap(project => project.techStack)))];
@@ -94,6 +105,7 @@ const Projects = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 w-full"
+                disabled={isLoading}
               />
             </div>
 
@@ -106,6 +118,7 @@ const Projects = () => {
                   size="sm"
                   onClick={() => handleTechFilter(tech)}
                   className="text-xs"
+                  disabled={isLoading}
                 >
                   <Filter size={12} className="mr-1" />
                   {tech}
@@ -115,111 +128,128 @@ const Projects = () => {
           </motion.div>
 
           {/* Results Summary */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="mb-6 text-center"
-          >
-            <p className="text-muted-foreground">
-              Showing {filteredProjects.length} of {projects.length} projects
-              {selectedTech !== 'All' && ` using ${selectedTech}`}
-              {searchTerm && ` matching "${searchTerm}"`}
-            </p>
-          </motion.div>
+          {!isLoading && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="mb-6 text-center"
+            >
+              <p className="text-muted-foreground">
+                Showing {filteredProjects.length} of {projects.length} projects
+                {selectedTech !== 'All' && ` using ${selectedTech}`}
+                {searchTerm && ` matching "${searchTerm}"`}
+              </p>
+            </motion.div>
+          )}
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredProjects.map((project, index) => (
-              <motion.article
-                key={project.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                className="group bg-card rounded-xl shadow-lg overflow-hidden border hover:shadow-xl transition-all duration-300"
-                onClick={() => handleProjectView(project)}
-              >
-                <div className="relative overflow-hidden">
-                  <img
-                    src={project.image}
-                    alt={`${project.title} project screenshot`}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    loading="lazy"
-                  />
-                  {project.featured && (
-                    <div className="absolute top-3 right-3">
-                      <span className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
-                        Featured
-                      </span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="text-muted-foreground mb-4 leading-relaxed">
-                    {project.description}
-                  </p>
-                  
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {project.techStack.map((tech, i) => (
-                      <span
-                        key={i}
-                        className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-medium cursor-pointer hover:bg-secondary/20 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleTechFilter(tech);
-                        }}
-                      >
-                        {tech}
-                      </span>
-                    ))}
+            {isLoading ? (
+              // Show skeleton loaders
+              Array.from({ length: 6 }).map((_, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  <ProjectSkeleton />
+                </motion.div>
+              ))
+            ) : (
+              // Show actual projects
+              filteredProjects.map((project, index) => (
+                <motion.article
+                  key={project.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  viewport={{ once: true }}
+                  whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                  className="group bg-card rounded-xl shadow-lg overflow-hidden border hover:shadow-xl transition-all duration-300"
+                  onClick={() => handleProjectView(project)}
+                >
+                  <div className="relative overflow-hidden">
+                    <img
+                      src={project.image}
+                      alt={`${project.title} project screenshot`}
+                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      loading="lazy"
+                    />
+                    {project.featured && (
+                      <div className="absolute top-3 right-3">
+                        <span className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
+                          Featured
+                        </span>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300"></div>
                   </div>
                   
-                  <div className="flex items-center justify-between">
-                    <div className="flex space-x-3">
-                      <a
-                        href={project.demoLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
-                        aria-label={`View ${project.title} live demo`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleProjectDemo(project);
-                        }}
-                      >
-                        <ExternalLink size={16} className="mr-1" />
-                        Live Demo
-                      </a>
-                      <a
-                        href={project.githubLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
-                        aria-label={`View ${project.title} source code`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleProjectCode(project);
-                        }}
-                      >
-                        <Github size={16} className="mr-1" />
-                        Code
-                      </a>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold mb-3 group-hover:text-primary transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                      {project.description}
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {project.techStack.map((tech, i) => (
+                        <span
+                          key={i}
+                          className="px-3 py-1 bg-secondary/10 text-secondary rounded-full text-sm font-medium cursor-pointer hover:bg-secondary/20 transition-colors"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleTechFilter(tech);
+                          }}
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex space-x-3">
+                        <a
+                          href={project.demoLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
+                          aria-label={`View ${project.title} live demo`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleProjectDemo(project);
+                          }}
+                        >
+                          <ExternalLink size={16} className="mr-1" />
+                          Live Demo
+                        </a>
+                        <a
+                          href={project.githubLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center text-primary hover:text-primary/80 transition-colors font-medium"
+                          aria-label={`View ${project.title} source code`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleProjectCode(project);
+                          }}
+                        >
+                          <Github size={16} className="mr-1" />
+                          Code
+                        </a>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.article>
-            ))}
+                </motion.article>
+              ))
+            )}
           </div>
 
           {/* No Results Message */}
-          {filteredProjects.length === 0 && (
+          {!isLoading && filteredProjects.length === 0 && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
