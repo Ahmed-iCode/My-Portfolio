@@ -7,7 +7,8 @@ import {
   FileText, 
   Plus,
   BarChart3,
-  Shield
+  Shield,
+  Download
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,6 +17,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { useCertificates, useProjects, useArticles } from '@/hooks/useLocalData';
 import CertificatesManager from '@/components/admin/CertificatesManager';
+import DataExporter from '@/components/admin/DataExporter';
 
 const AdminDashboard = () => {
   const { logout } = useAuth();
@@ -93,7 +95,7 @@ const AdminDashboard = () => {
       {/* Main Content */}
       <main className="container py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:grid-cols-5">
             <TabsTrigger value="overview" className="gap-2">
               <BarChart3 className="w-4 h-4" />
               <span className="hidden sm:inline">Overview</span>
@@ -109,6 +111,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="articles" className="gap-2">
               <FileText className="w-4 h-4" />
               <span className="hidden sm:inline">Articles</span>
+            </TabsTrigger>
+            <TabsTrigger value="export" className="gap-2">
+              <Download className="w-4 h-4" />
+              <span className="hidden sm:inline">Export</span>
             </TabsTrigger>
           </TabsList>
 
@@ -134,7 +140,7 @@ const AdminDashboard = () => {
                     <span className="font-medium">Local Mode Active</span>
                   </div>
                   <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-                    Your data is stored locally in your browser. Changes will persist until you clear your browser data.
+                    Your data is stored locally in your browser. Use the Export tab to sync changes with your codebase.
                   </p>
                 </CardContent>
               </Card>
@@ -179,7 +185,7 @@ const AdminDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <Button 
                       variant="outline" 
                       className="h-auto p-4 flex flex-col gap-2"
@@ -208,6 +214,16 @@ const AdminDashboard = () => {
                       <FileText className="w-6 h-6 text-purple-600" />
                       <span className="font-medium">Write Article</span>
                       <span className="text-xs text-muted-foreground">Create a new blog post</span>
+                    </Button>
+
+                    <Button 
+                      variant="outline" 
+                      className="h-auto p-4 flex flex-col gap-2"
+                      onClick={() => setActiveTab('export')}
+                    >
+                      <Download className="w-6 h-6 text-indigo-600" />
+                      <span className="font-medium">Export Data</span>
+                      <span className="text-xs text-muted-foreground">Sync with codebase</span>
                     </Button>
                   </div>
                 </CardContent>
@@ -315,6 +331,11 @@ const AdminDashboard = () => {
                 </CardContent>
               </Card>
             </motion.div>
+          </TabsContent>
+
+          {/* Export Tab */}
+          <TabsContent value="export">
+            <DataExporter />
           </TabsContent>
         </Tabs>
       </main>
