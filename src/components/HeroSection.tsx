@@ -80,7 +80,7 @@ const HeroSection = () => {
             className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto md:mx-0"
           >
             <div className="text-center md:text-left">
-              <div className="text-2xl md:text-3xl font-bold text-primary">30+</div>
+              <div className="text-2xl md:text-3xl font-bold text-primary">6+</div>
               <div className="text-sm text-muted-foreground">Certificates</div>
             </div>
             <div className="text-center md:text-left">
