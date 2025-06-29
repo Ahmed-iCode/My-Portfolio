@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const ADMIN_PASSWORD = 'ahmedCMS2025';
+const ADMIN_PASSWORD = 'ahmed2005';
 const AUTH_KEY = 'portfolio_admin_auth';
 
 export const useAuth = () => {
